@@ -13,12 +13,11 @@ export default function HomeScreen(){
     const [itens, setItens] = useState<Item[]>([]);
     const [salvaNome, setSalvaNome] = useState<string>();
     const [salvaDescricao, setSalvaDescricao] = useState<string>();
-    const [salvaId, setSalvaId] = useState<number>();
 
     const [itemSelecionado, setItemSelecionado] = useState<Item>();
     const [optionNumber, setOptionNumber] = useState<number>();
 
-    useEffect(function (){
+    function recarregar (){
         axios.get('http://localhost:4000/api/itens')
         .then(function (response) {
             setItens(response.data);
@@ -26,7 +25,9 @@ export default function HomeScreen(){
         .catch(function (error) {
             alert(error);   
         });
-    },[]);
+    };
+
+    useEffect(() => recarregar(), []);
 
     function botaoSalvarClicado() {
         if((salvaNome !== undefined) && (salvaDescricao !== undefined)){
@@ -36,10 +37,8 @@ export default function HomeScreen(){
             }
 
             axios.post('http://localhost:4000/api/itens',itemToSave)
-            .then()
+            .then(() => recarregar())
             .catch();
-
-            location.reload();
         }
     }
 
@@ -55,29 +54,34 @@ export default function HomeScreen(){
                 alert(error);
             });
         }
+        recarregar();
     }
 
-    // function botaoEditarClicado() {
-    //     if ((salvaNome !== undefined) && (salvaDescricao !== undefined) && (salvaId !== undefined)) {
-    //         const itemToEdit: Item = {
-    //             nome: salvaNome,
-    //             descricao: salvaDescricao
-    //         }
+    function botaoEditarClicado(id: number | undefined, nomeV: string | undefined, descricaoV: string | undefined) {
 
-    //         axios.post(`http://localhost:4000/api/itens/${salvaId}`, itemToEdit)
-    //         .then()
-    //         .catch();
+        let nomezinho;
+        (salvaNome === undefined)?(nomezinho = nomeV):(nomezinho = salvaNome)
 
-    //         location.reload();
-    // }}
+        let descricaozinha;
+        (salvaDescricao === undefined)?(descricaozinha = descricaoV):(descricaozinha = salvaDescricao)
+
+
+        const itemToEdit: Item = {nome: nomezinho, descricao: descricaozinha}
+
+         if ((id !== undefined)) {
+            console.log(id, salvaNome, salvaDescricao)
+
+            console.log({itemToEdit})
+            axios.put(`http://localhost:4000/api/itens/${id}`, itemToEdit)
+            .then(() => recarregar())
+            .catch();
+    }}
 
     function botaoDeletarClicado(id : number | undefined) {
         if(id !== undefined) {
              axios.delete(`http://localhost:4000/api/itens/${id}`)
-             .then()
+             .then(() => recarregar())
              .catch();
-
-             location.reload();
          }
     }
 
@@ -117,41 +121,15 @@ export default function HomeScreen(){
                             setSalvaNome(e.target.value)
                         }}></input>
 
-                        <textarea defaultValue={itemSelecionado?.descricao} onChange={function(e){
+                        <input defaultValue={itemSelecionado?.descricao} onChange={function(e){
                             setSalvaDescricao(e.target.value)
-                        }}></textarea>
+                        }}></input>
 
-                        <button>Editar</button>
+                        <button onClick={() => botaoEditarClicado(itemSelecionado?.id, itemSelecionado?.nome, itemSelecionado?.descricao)}>Editar</button>
                         <button onClick={() => botaoDeletarClicado(itemSelecionado?.id)}>Deletar</button>
 
                     </div>
                 )}
-
-                {/* {(optionNumber == 3) && (
-                    <div>
-                        <input placeholder="Id" onChange={function(e){
-                            setSalvaId(+e.target.value);
-                        }} /> 
-                        <input placeholder="Nome" onChange={function(e){
-                            setSalvaNome(e.target.value)
-                        }}/>
-                        <input placeholder="Descricao" onChange={function(e){
-                            setSalvaDescricao(e.target.value)
-                        }}/>
-
-                        <button onClick={botaoEditarClicado}>Editar</button>
-                    </div>
-                )}  
-
-                {(optionNumber == 4) && (
-                    <div>
-                        <input placeholder="Id" onChange={function(e){
-                            setSalvaId(+e.target.value);
-                        }} /> 
-
-                    <button onClick={botaoDeletarClicado}>Deletar</button>   
-                    </div>
-                )} */}
             </div>
         </div>
     )
