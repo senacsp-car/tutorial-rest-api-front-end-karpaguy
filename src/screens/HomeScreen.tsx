@@ -113,13 +113,13 @@ export default function HomeScreen(){
                 {(optionNumber == 2) && (
                     <div>
                         {/* <button onClick={alert(salvaId)!}>Selecionar</button>   */}
-                        <input value={itemSelecionado?.nome} onChange={function(e){
+                        <input defaultValue={itemSelecionado?.nome} onChange={function(e){
                             setSalvaNome(e.target.value)
                         }}></input>
 
-                        <input value={itemSelecionado?.descricao} onChange={function(e){
+                        <textarea defaultValue={itemSelecionado?.descricao} onChange={function(e){
                             setSalvaDescricao(e.target.value)
-                        }}></input>
+                        }}></textarea>
 
                         <button>Editar</button>
                         <button onClick={() => botaoDeletarClicado(itemSelecionado?.id)}>Deletar</button>
